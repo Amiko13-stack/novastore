@@ -1,61 +1,69 @@
-import Link from "next/link";
+import { CategorySection } from "@/components/home/category-section";
+import { EditorialSection } from "@/components/home/editorial-section";
+import { Hero } from "@/components/home/hero";
+import { TrustStrip } from "@/components/home/trust-strip";
+import { ProductGrid } from "@/components/product/product-grid";
 import { Container } from "@/components/ui/container";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { getCategories } from "@/services/category.service";
+import { getProducts } from "@/services/product.service";
 
-const foundation = [
-  "Next.js App Router + TypeScript",
-  "Tailwind CSS responsive UI",
-  "Server/API layer with Route Handlers",
-  "AWS DynamoDB data layer",
-  "Reusable components and typed entities",
-  "Environment variables for configuration",
-];
+export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [categories, products] = await Promise.all([getCategories(), getProducts()]);
+
+  const sortedCategories = [...categories].sort((a, b) => a.name.localeCompare(b.name));
+  const newest = [...products]
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, 4);
+  const featured = [...products]
+    .filter((product) => product.featured)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+  const heroProduct = featured[0] ?? newest[0];
+  const editorialProduct = products.find((product) => product.categoryId === "cat-home") ?? featured[1] ?? newest[1];
+  const categoryNames = Object.fromEntries(categories.map((category) => [category.categoryId, category.name]));
+
   return (
     <main>
-      <section className="border-b border-zinc-200 bg-white py-20">
+      <Hero product={heroProduct} />
+
+      <CategorySection categories={sortedCategories} />
+
+      <section id="new-arrivals" className="border-y border-zinc-300/60 bg-white/55 py-20 sm:py-28">
         <Container>
-          <div className="max-w-3xl">
-            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-zinc-500">
-              Software Engineer Internship Project
-            </p>
-            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-              A real full-stack e-commerce application.
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600">
-              NovaStore will include products, categories, search, cart, wishlist,
-              API logic, validation, error handling, and DynamoDB persistence.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/products"
-                className="rounded-xl bg-zinc-950 px-5 py-3 text-sm font-semibold text-white hover:bg-zinc-800"
-              >
-                Browse products
-              </Link>
-              <a
-                href="/api/health"
-                className="rounded-xl border border-zinc-300 bg-white px-5 py-3 text-sm font-semibold hover:bg-zinc-100"
-              >
-                API health check
-              </a>
-            </div>
+          <SectionHeading
+            eyebrow="New arrivals"
+            title="Freshly added to the edit."
+            description="The newest pieces in NovaStore, pulled directly from the live DynamoDB catalog."
+            href="/products"
+            linkLabel="Shop all"
+          />
+          <div className="mt-10">
+            <ProductGrid products={newest} categoryNames={categoryNames} />
           </div>
         </Container>
       </section>
 
-      <section className="py-14">
+      <EditorialSection product={editorialProduct} />
+
+      <section className="py-20 sm:py-28">
         <Container>
-          <h2 className="text-2xl font-bold">Day 1 foundation</h2>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {foundation.map((item) => (
-              <div key={item} className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-                <p className="font-medium">{item}</p>
-              </div>
-            ))}
+          <SectionHeading
+            eyebrow="Selected for you"
+            title="Objects worth keeping around."
+            description="A focused edit of standout products across technology, fashion and home."
+            href="/products"
+            linkLabel="Explore everything"
+          />
+          <div className="mt-10">
+            <ProductGrid products={featured.slice(0, 4)} categoryNames={categoryNames} />
           </div>
         </Container>
       </section>
+
+      <TrustStrip />
     </main>
   );
 }
