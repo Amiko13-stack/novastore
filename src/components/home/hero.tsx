@@ -6,81 +6,65 @@ import { formatCurrency } from "@/utils/format-currency";
 
 export function Hero({ product }: { product?: Product }) {
   return (
-    <section className="px-4 pt-4 sm:px-6 lg:px-10 xl:px-12">
-      <div className="mx-auto grid min-h-[620px] max-w-[1440px] overflow-hidden rounded-[28px] bg-zinc-950 text-white lg:grid-cols-[0.95fr_1.05fr] lg:rounded-[36px]">
-        <div className="flex flex-col justify-between p-7 sm:p-10 lg:p-14 xl:p-16">
-          <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-400">
-            <span className="h-px w-8 bg-zinc-600" />
-            New season · 2026
-          </div>
+    <section className="px-4 pt-5 sm:px-6 lg:px-10 xl:px-12">
+      <div className="mx-auto max-w-[1500px] overflow-hidden rounded-[30px] border border-black/[0.06] bg-[#e8e5dc] lg:rounded-[42px]">
+        <div className="grid min-h-[720px] lg:grid-cols-[0.82fr_1.18fr]">
+          <div className="relative z-10 flex flex-col justify-between p-7 sm:p-10 lg:p-14 xl:p-16">
+            <div className="flex items-center justify-between gap-5">
+              <div className="flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-zinc-600">
+                <span className="h-px w-9 bg-zinc-500" />
+                Nova / 2026
+              </div>
+              <span className="text-[10px] uppercase tracking-[0.24em] text-zinc-500">Curated objects</span>
+            </div>
 
-          <div className="py-14 lg:py-16">
-            <h1 className="max-w-3xl text-[clamp(3.4rem,7vw,7.4rem)] font-medium leading-[0.9] tracking-[-0.07em]">
-              Everyday,
-              <br />
-              considered.
-            </h1>
-            <p className="mt-7 max-w-lg text-base leading-7 text-zinc-400 sm:text-lg">
-              A curated collection of modern essentials for work, home and everything in between.
-            </p>
+            <div className="py-14 lg:py-20">
+              <p className="mb-5 text-sm font-medium text-zinc-600">Modern essentials, edited down.</p>
+              <h1 className="max-w-4xl text-[clamp(4rem,8.4vw,8.6rem)] font-medium leading-[0.83] tracking-[-0.082em] text-zinc-950">
+                Everyday,
+                <br />
+                considered.
+              </h1>
+              <p className="mt-8 max-w-md text-[15px] leading-7 text-zinc-600 sm:text-base">
+                Useful things with a point of view — selected across technology, fashion and home.
+              </p>
+              <div className="mt-9 flex flex-wrap gap-3">
+                <Link href="/products" className="group inline-flex items-center gap-3 rounded-full bg-zinc-950 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(17,17,17,.12)] transition duration-300 hover:-translate-y-0.5 hover:bg-zinc-800">
+                  Shop the edit
+                  <ArrowRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </Link>
+                <Link href="/#categories" className="inline-flex items-center rounded-full border border-black/[0.12] bg-white/30 px-6 py-3.5 text-sm font-semibold text-zinc-950 transition hover:bg-white/70">
+                  Explore categories
+                </Link>
+              </div>
+            </div>
 
-            <div className="mt-9 flex flex-wrap gap-3">
-              <Link
-                href="/products"
-                className="group inline-flex items-center gap-3 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-200"
-              >
-                Shop collection
-                <ArrowRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-              </Link>
-              <Link
-                href="/#categories"
-                className="inline-flex items-center rounded-full border border-white/20 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
-              >
-                Explore categories
-              </Link>
+            <div className="grid grid-cols-3 gap-5 border-t border-black/[0.10] pt-6 text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+              <span>01 / Curated</span><span>02 / Responsive</span><span>03 / Live data</span>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-x-8 gap-y-3 border-t border-white/10 pt-5 text-xs text-zinc-500">
-            <span>Curated essentials</span>
-            <span>Responsive shopping</span>
-            <span>Secure server data</span>
-          </div>
-        </div>
-
-        <div className="relative min-h-[520px] overflow-hidden bg-zinc-900 lg:min-h-full">
-          {product ? (
-            <>
-              <Image
-                src={product.imageUrl}
-                alt={product.name}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 55vw"
-                className="object-cover transition duration-700 hover:scale-[1.02]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/5" />
-              <Link
-                href={`/products/${product.productId}`}
-                className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-4 rounded-[22px] border border-white/15 bg-black/35 p-4 backdrop-blur-md sm:bottom-7 sm:left-7 sm:right-7 sm:p-5"
-              >
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-300">Featured object</p>
-                  <p className="mt-1 text-lg font-medium tracking-tight">{product.name}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="hidden text-sm text-zinc-200 sm:inline">{formatCurrency(product.price)}</span>
-                  <span className="grid h-10 w-10 place-items-center rounded-full bg-white text-zinc-950">
+          <div className="relative min-h-[520px] overflow-hidden bg-[#d8d5cd] lg:min-h-full">
+            {product ? (
+              <>
+                <Image src={product.imageUrl} alt={product.name} fill priority sizes="(max-width: 1024px) 100vw, 62vw" className="object-cover saturate-[0.92] transition duration-1000 hover:scale-[1.025]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-white/5" />
+                <div className="absolute left-5 top-5 rounded-full border border-white/30 bg-white/70 px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.18em] text-zinc-900 backdrop-blur-md sm:left-7 sm:top-7">Featured / 01</div>
+                <Link href={`/products/${product.productId}`} className="group absolute bottom-5 left-5 right-5 grid grid-cols-[1fr_auto] items-end gap-5 rounded-[26px] border border-white/15 bg-black/45 p-5 text-white shadow-[0_18px_60px_rgba(0,0,0,.18)] backdrop-blur-xl sm:bottom-7 sm:left-7 sm:right-7 sm:p-6">
+                  <div>
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-white/60">Object of the week</p>
+                    <p className="mt-2 text-xl font-medium tracking-[-0.035em] sm:text-2xl">{product.name}</p>
+                    <p className="mt-2 text-sm text-white/65">{formatCurrency(product.price)}</p>
+                  </div>
+                  <span className="grid h-12 w-12 place-items-center rounded-full bg-white text-zinc-950 transition-transform duration-300 group-hover:translate-x-1">
                     <ArrowRightIcon className="h-4 w-4" />
                   </span>
-                </div>
-              </Link>
-            </>
-          ) : (
-            <div className="absolute inset-0 grid place-items-center p-10 text-center text-zinc-500">
-              Your featured product will appear here after the database is seeded.
-            </div>
-          )}
+                </Link>
+              </>
+            ) : (
+              <div className="absolute inset-0 grid place-items-center p-10 text-center text-zinc-500">Seed the database to reveal the featured product.</div>
+            )}
+          </div>
         </div>
       </div>
     </section>

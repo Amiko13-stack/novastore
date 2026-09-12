@@ -5,18 +5,11 @@ import { SectionHeading } from "@/components/ui/section-heading";
 
 export function CategorySection({ categories }: { categories: Category[] }) {
   return (
-    <section id="categories" className="py-20 sm:py-28">
+    <section id="categories" className="py-24 sm:py-32 lg:py-36">
       <Container>
-        <SectionHeading
-          eyebrow="Shop by category"
-          title="Find what fits your day."
-          description="Three focused collections, selected around usefulness, simplicity and modern design."
-        />
-
-        <div className="mt-10 grid gap-4 md:grid-cols-3 lg:gap-5">
-          {categories.map((category, index) => (
-            <CategoryCard key={category.categoryId} category={category} index={index} />
-          ))}
+        <SectionHeading eyebrow="Shop by category" title="Three worlds. One point of view." description="A focused collection across technology, fashion and home — selected to feel useful, current and easy to live with." />
+        <div className="mt-12 grid gap-4 md:grid-cols-12 lg:gap-5">
+          {categories.map((category, index) => <CategoryCard key={category.categoryId} category={category} index={index} />)}
         </div>
       </Container>
     </section>

@@ -5,44 +5,29 @@ import { Container } from "@/components/ui/container";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b border-black/[0.06] bg-[#f6f6f3]/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-black/[0.055] bg-[#f3f1eb]/88 backdrop-blur-2xl">
       <Container>
-        <div className="flex h-16 items-center justify-between gap-5 lg:h-[72px]">
+        <div className="flex h-[72px] items-center justify-between gap-5 lg:h-[78px]">
           <div className="flex items-center gap-3">
             <MobileNav />
-            <Link href="/" className="text-lg font-semibold tracking-[-0.045em] text-zinc-950 sm:text-xl">
-              NOVA<span className="font-normal text-zinc-400">STORE</span>
+            <Link href="/" className="group inline-flex items-center gap-2 text-[17px] font-semibold tracking-[-0.055em] text-zinc-950 sm:text-[19px]">
+              NOVA<span className="font-normal text-zinc-400 transition-colors group-hover:text-zinc-600">STORE</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-zinc-950" />
             </Link>
           </div>
 
-          <nav className="hidden items-center gap-8 text-sm font-medium text-zinc-600 lg:flex">
-            <Link href="/products" className="transition hover:text-zinc-950">Shop</Link>
-            <Link href="/#new-arrivals" className="transition hover:text-zinc-950">New arrivals</Link>
-            <Link href="/#categories" className="transition hover:text-zinc-950">Categories</Link>
+          <nav className="hidden items-center gap-1 rounded-full border border-black/[0.07] bg-white/55 p-1 text-[13px] font-medium text-zinc-600 shadow-[0_8px_30px_rgba(0,0,0,.025)] lg:flex">
+            <Link href="/products" className="rounded-full px-5 py-2.5 transition hover:bg-zinc-950 hover:text-white">Shop</Link>
+            <Link href="/#new-arrivals" className="rounded-full px-5 py-2.5 transition hover:bg-zinc-950 hover:text-white">New arrivals</Link>
+            <Link href="/#categories" className="rounded-full px-5 py-2.5 transition hover:bg-zinc-950 hover:text-white">Categories</Link>
           </nav>
 
           <div className="flex items-center gap-1">
-            <Link
-              href="/products"
-              aria-label="Search products"
-              className="grid h-10 w-10 place-items-center rounded-full transition hover:bg-white"
-            >
-              <SearchIcon className="h-[19px] w-[19px]" />
-            </Link>
-            <Link
-              href="/wishlist"
-              aria-label="Wishlist"
-              className="hidden h-10 w-10 place-items-center rounded-full transition hover:bg-white sm:grid"
-            >
-              <HeartIcon className="h-[19px] w-[19px]" />
-            </Link>
-            <Link
-              href="/cart"
-              aria-label="Shopping bag"
-              className="grid h-10 w-10 place-items-center rounded-full transition hover:bg-white"
-            >
-              <BagIcon className="h-[19px] w-[19px]" />
-            </Link>
+            {[{href:"/products",label:"Search products",Icon:SearchIcon},{href:"/wishlist",label:"Wishlist",Icon:HeartIcon},{href:"/cart",label:"Shopping bag",Icon:BagIcon}].map(({href,label,Icon},i)=>(
+              <Link key={label} href={href} aria-label={label} className={`${i===1?"hidden sm:grid":"grid"} h-10 w-10 place-items-center rounded-full border border-transparent transition duration-300 hover:border-black/[0.06] hover:bg-white hover:shadow-sm`}>
+                <Icon className="h-[18px] w-[18px]" />
+              </Link>
+            ))}
           </div>
         </div>
       </Container>
