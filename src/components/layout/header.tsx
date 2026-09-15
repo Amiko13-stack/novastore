@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CartLink } from "@/components/cart/cart-link";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { SiteSearch } from "@/components/search/site-search";
-import { HeartIcon } from "@/components/ui/icons";
+import { WishlistLink } from "@/components/wishlist/wishlist-link";
 import { Container } from "@/components/ui/container";
 
 export function Header() {
@@ -26,9 +26,7 @@ export function Header() {
 
           <div className="flex items-center gap-1">
             <SiteSearch />
-            <Link href="/wishlist" aria-label="Wishlist" className="hidden h-10 w-10 place-items-center rounded-full border border-transparent transition duration-300 hover:border-black/[0.06] hover:bg-white hover:shadow-sm sm:grid">
-              <HeartIcon className="h-[18px] w-[18px]" />
-            </Link>
+            <WishlistLink />
             <CartLink />
           </div>
         </div>

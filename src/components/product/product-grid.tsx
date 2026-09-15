@@ -6,9 +6,11 @@ import { ArrowRightIcon } from "@/components/ui/icons";
 export function ProductGrid({
   products,
   categoryNames = {},
+  savedProductIds = [],
 }: {
   products: Product[];
   categoryNames?: Record<string, string>;
+  savedProductIds?: string[];
 }) {
   if (products.length === 0) {
     return (
@@ -26,6 +28,8 @@ export function ProductGrid({
     );
   }
 
+  const saved = new Set(savedProductIds);
+
   return (
     <div className="grid grid-cols-1 gap-x-4 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-5 xl:gap-y-12">
       {products.map((product) => (
@@ -33,6 +37,7 @@ export function ProductGrid({
           key={product.productId}
           product={product}
           categoryName={categoryNames[product.categoryId]}
+          saved={saved.has(product.productId)}
         />
       ))}
     </div>

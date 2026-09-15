@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { CatalogControls } from "@/components/catalog/catalog-controls";
 import { ProductGrid } from "@/components/product/product-grid";
 import { Container } from "@/components/ui/container";
+import { getCurrentUserId } from "@/lib/auth/current-user";
 import { catalogQuerySchema } from "@/lib/validation/catalog.schema";
 import { getCategories } from "@/services/category.service";
 import { searchProducts } from "@/services/product.service";
+import { getWishlist } from "@/services/wishlist.service";
 
 export const metadata: Metadata = {
   title: "Shop",
@@ -36,9 +38,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         sort: "newest" as const,
       };
 
-  const [categories, products] = await Promise.all([
+  const [categories, products, wishlist] = await Promise.all([
     getCategories(),
     searchProducts(filters),
+    getWishlist(getCurrentUserId()),
   ]);
 
   const activeCategory = filters.categoryId
@@ -47,6 +50,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const categoryNames = Object.fromEntries(
     categories.map((category) => [category.categoryId, category.name]),
   );
+  const savedProductIds = wishlist.items.map((item) => item.product.productId);
 
   const heading = filters.q
     ? `Results for “${filters.q}”`
@@ -62,19 +66,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         <Container>
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
             <div className="max-w-4xl">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-500">
-                The shop
-              </p>
-              <h1 className="mt-4 text-5xl font-medium leading-[0.94] tracking-[-0.06em] sm:text-6xl lg:text-7xl">
-                {heading}
-              </h1>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-600">
-                {description}
-              </p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-500">The shop</p>
+              <h1 className="mt-4 text-5xl font-medium leading-[0.94] tracking-[-0.06em] sm:text-6xl lg:text-7xl">{heading}</h1>
+              <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-600">{description}</p>
             </div>
-            <p className="text-sm text-zinc-500">
-              {products.length} {products.length === 1 ? "piece" : "pieces"}
-            </p>
+            <p className="text-sm text-zinc-500">{products.length} {products.length === 1 ? "piece" : "pieces"}</p>
           </div>
         </Container>
       </section>
@@ -82,13 +78,20 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       <section className="py-8 sm:py-10">
         <Container>
           <CatalogControls
+            key={[
+              filters.q ?? "",
+              filters.categoryId ?? "",
+              filters.minPrice ?? "",
+              filters.maxPrice ?? "",
+              filters.sort,
+            ].join("|")}
             categories={categories}
             resultCount={products.length}
             values={filters}
           />
 
           <div className="pt-10 sm:pt-12">
-            <ProductGrid products={products} categoryNames={categoryNames} />
+            <ProductGrid products={products} categoryNames={categoryNames} savedProductIds={savedProductIds} />
           </div>
         </Container>
       </section>

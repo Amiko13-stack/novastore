@@ -41,6 +41,7 @@ export function MobileNav() {
                 ["Shop all", "/products"],
                 ["New arrivals", "/#new-arrivals"],
                 ["Categories", "/#categories"],
+                ["My profile", "/account"],
               ].map(([label, href]) => (
                 <Link
                   key={label}

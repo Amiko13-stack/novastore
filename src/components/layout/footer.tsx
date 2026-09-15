@@ -13,6 +13,7 @@ const footerGroups = [
   {
     title: "Account",
     links: [
+      ["My profile", "/account"],
       ["Wishlist", "/wishlist"],
       ["Shopping bag", "/cart"],
       ["API status", "/api/health"],
