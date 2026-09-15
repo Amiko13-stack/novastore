@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MobileNav } from "@/components/layout/mobile-nav";
-import { BagIcon, HeartIcon, SearchIcon } from "@/components/ui/icons";
+import { SiteSearch } from "@/components/search/site-search";
+import { BagIcon, HeartIcon } from "@/components/ui/icons";
 import { Container } from "@/components/ui/container";
 
 export function Header() {
@@ -23,11 +24,13 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-1">
-            {[{href:"/products",label:"Search products",Icon:SearchIcon},{href:"/wishlist",label:"Wishlist",Icon:HeartIcon},{href:"/cart",label:"Shopping bag",Icon:BagIcon}].map(({href,label,Icon},i)=>(
-              <Link key={label} href={href} aria-label={label} className={`${i===1?"hidden sm:grid":"grid"} h-10 w-10 place-items-center rounded-full border border-transparent transition duration-300 hover:border-black/[0.06] hover:bg-white hover:shadow-sm`}>
-                <Icon className="h-[18px] w-[18px]" />
-              </Link>
-            ))}
+            <SiteSearch />
+            <Link href="/wishlist" aria-label="Wishlist" className="hidden h-10 w-10 place-items-center rounded-full border border-transparent transition duration-300 hover:border-black/[0.06] hover:bg-white hover:shadow-sm sm:grid">
+              <HeartIcon className="h-[18px] w-[18px]" />
+            </Link>
+            <Link href="/cart" aria-label="Shopping bag" className="grid h-10 w-10 place-items-center rounded-full border border-transparent transition duration-300 hover:border-black/[0.06] hover:bg-white hover:shadow-sm">
+              <BagIcon className="h-[18px] w-[18px]" />
+            </Link>
           </div>
         </div>
       </Container>

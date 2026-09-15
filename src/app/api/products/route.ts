@@ -1,16 +1,29 @@
 import type { NextRequest } from "next/server";
 import { apiErrorResponse } from "@/lib/http/api-error";
+import { catalogQuerySchema } from "@/lib/validation/catalog.schema";
 import { createProductSchema } from "@/lib/validation/product.schema";
-import { createProduct, getProducts } from "@/services/product.service";
+import { createProduct, searchProducts } from "@/services/product.service";
 
 export async function GET(request: NextRequest) {
   try {
-    const categoryId = request.nextUrl.searchParams.get("categoryId") ?? undefined;
-    const products = await getProducts(categoryId);
+    const input = catalogQuerySchema.parse({
+      q: request.nextUrl.searchParams.get("q") ?? undefined,
+      categoryId:
+        request.nextUrl.searchParams.get("categoryId") ?? undefined,
+      minPrice: request.nextUrl.searchParams.get("minPrice") ?? undefined,
+      maxPrice: request.nextUrl.searchParams.get("maxPrice") ?? undefined,
+      sort: request.nextUrl.searchParams.get("sort") ?? undefined,
+    });
+
+    const products = await searchProducts(input);
 
     return Response.json({
       success: true,
       data: products,
+      meta: {
+        count: products.length,
+        filters: input,
+      },
     });
   } catch (error) {
     return apiErrorResponse(error);

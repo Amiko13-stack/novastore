@@ -97,3 +97,49 @@ export async function deleteProduct(productId: string): Promise<Product> {
 
   return product;
 }
+
+export type CatalogFilters = {
+  q?: string;
+  categoryId?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  sort?: "newest" | "price-asc" | "price-desc" | "name-asc";
+};
+
+export async function searchProducts(
+  filters: CatalogFilters = {},
+): Promise<Product[]> {
+  const products = await listProducts(filters.categoryId);
+  const query = filters.q?.trim().toLocaleLowerCase();
+
+  const filtered = products.filter((product) => {
+    const matchesQuery = query
+      ? `${product.name} ${product.description} ${product.slug}`
+          .toLocaleLowerCase()
+          .includes(query)
+      : true;
+
+    const matchesMinimum =
+      filters.minPrice === undefined || product.price >= filters.minPrice;
+    const matchesMaximum =
+      filters.maxPrice === undefined || product.price <= filters.maxPrice;
+
+    return matchesQuery && matchesMinimum && matchesMaximum;
+  });
+
+  const sort = filters.sort ?? "newest";
+
+  return [...filtered].sort((a, b) => {
+    switch (sort) {
+      case "price-asc":
+        return a.price - b.price;
+      case "price-desc":
+        return b.price - a.price;
+      case "name-asc":
+        return a.name.localeCompare(b.name);
+      case "newest":
+      default:
+        return b.createdAt.localeCompare(a.createdAt);
+    }
+  });
+}
