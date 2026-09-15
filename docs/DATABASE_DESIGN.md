@@ -1,28 +1,148 @@
-# DynamoDB Design
+# DynamoDB Database Design
 
-This project intentionally uses five tables because the assignment has five clear entities and the eight-day deadline favors a simple, explainable architecture.
+NovaStore uses five DynamoDB tables. The design prioritizes clear entity ownership, explainable access patterns, and correct cart/wishlist behavior.
 
-| Table | Partition key | Sort key | Purpose |
+## Tables
+
+| Logical entity | Default table name | Partition key | Sort key |
 |---|---|---|---|
-| Users | `userId` | — | User profile data |
-| Categories | `categoryId` | — | Product categories |
-| Products | `productId` | — | Product catalog |
-| Cart | `userId` | `productId` | One item per product in a user's cart |
-| Wishlist | `userId` | `productId` | One item per product in a user's wishlist |
+| Users | `InternStore-Users` | `userId` | — |
+| Products | `InternStore-Products` | `productId` | — |
+| Categories | `InternStore-Categories` | `categoryId` | — |
+| Cart | `InternStore-Cart` | `userId` | `productId` |
+| Wishlist | `InternStore-Wishlist` | `userId` | `productId` |
 
-## Product GSI
+Table names are environment-configurable.
 
-`categoryId-createdAt-index`
+## Users
 
-- Partition key: `categoryId`
-- Sort key: `createdAt`
-- Used to list products in a category efficiently.
+Example:
 
-## Duplicate prevention
+```json
+{
+  "userId": "demo-user-1",
+  "name": "Nova Guest",
+  "email": "demo@novastore.local",
+  "createdAt": "ISO timestamp",
+  "updatedAt": "ISO timestamp"
+}
+```
 
-Cart and wishlist use the pair `(userId, productId)` as their complete primary key. A user therefore cannot have two independent records for the same product. Cart quantity is updated on the existing record instead.
+Access patterns:
+- read one user by `userId`
+- create user if missing
+- update profile name/email
 
-## Planned CRUD
+Commands:
+- `GetCommand`
+- `PutCommand`
+- `UpdateCommand`
+
+## Categories
+
+Example:
+
+```json
+{
+  "categoryId": "cat-electronics",
+  "name": "Electronics",
+  "slug": "electronics",
+  "description": "...",
+  "imageUrl": "...",
+  "createdAt": "ISO timestamp"
+}
+```
+
+Access patterns:
+- list categories
+- read one category
+- create category
+
+## Products
+
+Example:
+
+```json
+{
+  "productId": "prod-headphones",
+  "categoryId": "cat-electronics",
+  "name": "Nova Wireless Headphones",
+  "slug": "nova-wireless-headphones",
+  "description": "...",
+  "price": 129.99,
+  "imageUrl": "...",
+  "stock": 24,
+  "featured": true,
+  "createdAt": "ISO timestamp",
+  "updatedAt": "ISO timestamp"
+}
+```
+
+### Product GSI
+
+Index name: `categoryId-createdAt-index`
+
+- partition key: `categoryId`
+- sort key: `createdAt`
+
+Used to query products in a category without scanning the full table.
+
+Access patterns:
+- list catalog
+- query by category
+- retrieve product detail
+- create/update/delete product
+- search/filter/sort the demo catalog
+
+## Cart
+
+Example:
+
+```json
+{
+  "userId": "demo-user-1",
+  "productId": "prod-headphones",
+  "quantity": 2,
+  "addedAt": "ISO timestamp",
+  "updatedAt": "ISO timestamp"
+}
+```
+
+The complete key is `(userId, productId)`.
+
+Benefits:
+- one cart row per user/product pair
+- duplicate rows are naturally prevented
+- adding the same product updates quantity instead of inserting a second row
+- querying by `userId` returns the user's cart
+
+Business rules:
+- quantity must be positive
+- quantity cannot exceed product stock
+- product existence is verified server-side
+- subtotal is computed from current database prices, not client-supplied prices
+
+## Wishlist
+
+Example:
+
+```json
+{
+  "userId": "demo-user-1",
+  "productId": "prod-headphones",
+  "addedAt": "ISO timestamp"
+}
+```
+
+The complete key is `(userId, productId)`, which prevents duplicate saved products for one user.
+
+Access patterns:
+- query all saved products for a user
+- check if one product is saved
+- save one product
+- remove one product
+
+## CRUD / Operations Summary
 
 ### Users
 - Create: `PutCommand`
@@ -31,23 +151,34 @@ Cart and wishlist use the pair `(userId, productId)` as their complete primary k
 
 ### Products
 - Create: `PutCommand`
-- List/search: `ScanCommand` for the small demo catalog
-- Category listing: `QueryCommand` on the GSI
-- Detail: `GetCommand`
-- Update/delete: `UpdateCommand` / `DeleteCommand`
+- Read detail: `GetCommand`
+- List/search small demo catalog: `ScanCommand`
+- Category list: `QueryCommand` on GSI
+- Update: `UpdateCommand`
+- Delete: `DeleteCommand`
 
 ### Categories
-- Create/list/read: `PutCommand`, `ScanCommand`, `GetCommand`
+- Create: `PutCommand`
+- List: `ScanCommand`
+- Read: `GetCommand`
 
 ### Cart
-- Read user cart: `QueryCommand`
-- Add: `PutCommand` or `UpdateCommand`
-- Change quantity: `UpdateCommand`
+- List user's items: `QueryCommand`
+- Read one item: `GetCommand`
+- Add: `PutCommand`
+- Quantity update: `UpdateCommand`
 - Remove: `DeleteCommand`
 
 ### Wishlist
-- Read: `QueryCommand`
+- List user's items: `QueryCommand`
+- Read one item: `GetCommand`
 - Add: `PutCommand`
 - Remove: `DeleteCommand`
 
-For a small internship dataset, scanning products for text search is acceptable and easy to explain. For a large production catalog, full-text search should move to a search service rather than relying on DynamoDB scans.
+## Production considerations
+
+The current design is appropriate for the project scale. For a much larger production system, likely extensions include:
+- dedicated full-text search infrastructure
+- more DynamoDB secondary indexes for new access patterns
+- short-lived AWS credentials / workload identities instead of long-lived development keys
+- real authentication replacing the demo-user resolver
