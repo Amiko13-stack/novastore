@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { ProductGrid } from "@/components/product/product-grid";
 import { ScrollToTop } from "@/components/product/scroll-to-top";
 import { Container } from "@/components/ui/container";
@@ -106,14 +107,10 @@ export default async function ProductDetailsPage({ params }: ProductPageProps) {
               </div>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-[1fr_auto]">
-                <button
-                  type="button"
-                  disabled
-                  title="Cart integration is added on Day 5"
-                  className="h-14 rounded-full bg-zinc-950 px-7 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(17,17,17,.11)] transition hover:-translate-y-0.5 hover:bg-zinc-800 disabled:cursor-not-allowed"
-                >
-                  Add to bag
-                </button>
+                <AddToCartButton
+                  productId={product.productId}
+                  stock={product.stock}
+                />
                 <button
                   type="button"
                   disabled
