@@ -11,6 +11,10 @@ import fs from "node:fs";
   try {
     await page.goto("http://127.0.0.1:3000/admin");
     await page.getByRole("heading", { name: "Store overview" }).waitFor();
+    await page.getByRole("navigation", { name: "Admin navigation" }).getByRole("button", { name: "Products" }).click();
+    await page.getByRole("heading", { name: "Products", exact: true }).waitFor();
+    await page.getByRole("navigation", { name: "Admin navigation" }).getByRole("button", { name: "Overview", exact: true }).click();
+    await page.getByRole("heading", { name: "Store overview" }).waitFor();
     fs.mkdirSync("docs/screenshots", { recursive: true });
     await page.screenshot({ path: "docs/screenshots/admin-overview.png", fullPage: true });
     await page.getByRole("navigation", { name: "Admin navigation" }).getByRole("button", { name: "Products" }).click();
