@@ -6,7 +6,7 @@ with React, TypeScript, Tailwind CSS, and AWS DynamoDB.
 ## Submission links
 
 - Repository: https://github.com/Amiko13-stack/novastore
-- Hosted dashboard: https://novastore-admin-amiko.green-fairy-1807.chatgpt.site/admin
+- Hosted dashboard: https://novastore-admin-amiko.amovardo2007.chatgpt.site/admin
 - Screenshots: docs/screenshots
 - The hosted default view is explicitly labelled sample mode.
 

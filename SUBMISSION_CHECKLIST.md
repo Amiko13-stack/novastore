@@ -3,7 +3,7 @@
 ## Files to submit
 - GitHub repository: https://github.com/Amiko13-stack/novastore
 - Dashboard screenshots: docs/screenshots (sample data, clearly labelled)
-- Website URL: use the confirmed deployment URL supplied with the handoff
+- Website URL: https://novastore-admin-amiko.amovardo2007.chatgpt.site/admin
 
 ## Before final submission
 - [ ] Confirm the latest dashboard commit is visible in the GitHub repository.
