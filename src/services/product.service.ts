@@ -1,3 +1,4 @@
+import { ensureProductUnreferenced } from "@/services/admin.service";
 import { randomUUID } from "node:crypto";
 import { AppError } from "@/lib/http/api-error";
 import type {
@@ -89,6 +90,7 @@ export async function updateProduct(
 }
 
 export async function deleteProduct(productId: string): Promise<Product> {
+  await ensureProductUnreferenced(productId);
   const product = await deleteProductById(productId);
 
   if (!product) {

@@ -11,6 +11,7 @@ export class AppError extends Error {
 }
 
 export function apiErrorResponse(error: unknown): Response {
+  if (error instanceof SyntaxError) return Response.json({ success: false, error: "Invalid JSON request body" }, { status: 400 });
   if (error instanceof ZodError) {
     return Response.json(
       {

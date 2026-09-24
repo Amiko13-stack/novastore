@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { CategorySection } from "@/components/home/category-section";
 import { EditorialSection } from "@/components/home/editorial-section";
 import { Hero } from "@/components/home/hero";
@@ -13,6 +14,7 @@ import { getWishlist } from "@/services/wishlist.service";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  if (!process.env.AWS_REGION) redirect("/admin");
   const [categories, products, wishlist] = await Promise.all([
     getCategories(),
     getProducts(),

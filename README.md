@@ -1,275 +1,121 @@
-# NovaStore
+# NovaStore — E-commerce Admin Dashboard
 
-NovaStore is a production-style full-stack e-commerce application built with Next.js, React, TypeScript, Tailwind CSS, and AWS DynamoDB. It demonstrates the complete software-engineering workflow required for the internship task: requirements analysis, architecture, database design, server/API logic, validation, business rules, responsive UI, testing, documentation, and deployment readiness.
+NovaStore combines a Next.js storefront with a responsive admin dashboard built
+with React, TypeScript, Tailwind CSS, and AWS DynamoDB.
 
-> Live project: add your Vercel URL here after deployment.
+## Submission links
 
-## Features
+- Repository: https://github.com/Amiko13-stack/novastore
+- Hosted dashboard: https://novastore-admin-amiko.green-fairy-1807.chatgpt.site/admin
+- Screenshots: docs/screenshots
+- The hosted default view is explicitly labelled sample mode.
 
-### Storefront
-- Premium responsive homepage
-- Product categories and category browsing
-- Product listing and product detail pages
-- Product images and product information
-- Related products
-- Search by product name, description, and slug
-- Category and price filtering
-- Sorting by newest, price, and name
-- Shareable URL-based catalog filters
-- Loading, empty, error, and custom 404 states
+## Dashboard
 
-### Shopping cart
-- Add products to cart
-- Persistent DynamoDB-backed cart
-- Increase/decrease quantity
-- Remove items
-- Server-calculated line totals and subtotal
-- Stock validation
-- Duplicate prevention using `(userId, productId)` as the DynamoDB key
-- Header cart item count
+- Overview: total users, products, categories, cart quantities, wishlist entries,
+  inventory by category, low-stock indicators, and recently updated products.
+- Products: create, view, edit, delete, stock updates, search, category/stock
+  filters, pagination, featured products, and validated details.
+- Categories: create, view, edit, delete, search, and pagination.
+- Users: list, inspect details and relationships, update, delete, search, and pagination.
+- Carts and wishlists: inspect user/product relationships and remove entries.
+- Confirmation dialogs, loading feedback, empty states, error messages, and
+  responsive layouts including mobile product cards.
+- Server-side administrator authorization on administrative data and mutations.
 
-### Wishlist
-- Add/remove products from wishlist
-- Persistent DynamoDB-backed wishlist
-- Duplicate prevention using `(userId, productId)`
-- Wishlist count in navigation
-- Wishlist page using real product data
-
-### User data
-- Demo-user abstraction through `getCurrentUserId()`
-- User profile creation and updates
-- Persistent user data in DynamoDB
-- API endpoint for current-user data
-
-### Engineering quality
-- Next.js App Router
-- Server Components for server-side reads
-- Route Handlers for APIs
-- Repository layer for DynamoDB access
-- Service layer for business logic
-- Zod validation for important inputs
-- Structured API errors
-- TypeScript entity contracts
-- Environment-based configuration
-- No AWS credentials exposed to browser code
-- Git/GitHub workflow with meaningful commits
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Frontend | Next.js, React, TypeScript |
-| Styling | Tailwind CSS |
-| Server/API | Next.js Route Handlers / Server Components |
-| Database | AWS DynamoDB |
-| Validation | Zod |
-| AWS integration | AWS SDK for JavaScript v3 |
-| Version control | Git + GitHub |
-| Deployment | Vercel-ready |
+The default /admin workspace contains clearly labelled sample data. Changes in
+sample mode are held in memory and reset on reload; sample data is never written
+to AWS. Connect store switches to the actual database when server configuration
+and an administrator key are available.
 
 ## Architecture
 
-```text
-User / Browser
-      ↓
-Next.js Application
-      ↓
-Pages + React Components
-      ↓
-Server Components / Route Handlers
-      ↓
-Validation + Service Layer
-      ↓
-Repository Layer
-      ↓
-AWS SDK v3
-      ↓
-Amazon DynamoDB
-```
+Browser → Next.js route handlers → validation/services → repositories → DynamoDB.
 
-UI components never access AWS credentials or DynamoDB directly. Server-side code owns validation, business rules, totals, persistence, and database access.
+The standard Next.js build remains available. A separate Vinext/Vite adapter
+produces the Cloudflare Worker artifact used by Sites hosting.
 
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for a detailed explanation.
+## Local setup
 
-## DynamoDB Design
+Requires Node.js 22.12 or later for both the Next.js and Sites builds.
 
-NovaStore uses five tables:
+1. Clone this repository and run npm ci.
+2. Run npm run dev.
+3. Open http://localhost:3000/admin to explore the sample dashboard.
 
-| Table | Partition key | Sort key | Purpose |
-|---|---|---|---|
-| `InternStore-Users` | `userId` | — | User profiles |
-| `InternStore-Products` | `productId` | — | Product catalog |
-| `InternStore-Categories` | `categoryId` | — | Product categories |
-| `InternStore-Cart` | `userId` | `productId` | Persistent shopping cart |
-| `InternStore-Wishlist` | `userId` | `productId` | Persistent wishlist |
+Live data requires an ignored .env.local file with the variables documented in
+.env.example. AWS credentials must be supplied through the server environment or
+the standard AWS credential provider chain. For local development, AWS CLI
+sign-in can supply short-lived credentials. Do not commit credentials.
 
-Products also use the `categoryId-createdAt-index` Global Secondary Index:
+ADMIN_ACCESS_KEY must contain at least 32 random characters. Enter this key in
+Connect store. It stays in browser memory only; reload/disconnect ends the
+session. Use HTTPS outside local development.
 
-- Partition key: `categoryId`
-- Sort key: `createdAt`
-- Purpose: efficient category product queries
+## Existing DynamoDB tables
 
-See [`docs/DATABASE_DESIGN.md`](docs/DATABASE_DESIGN.md) for entity shapes, access patterns, and business rules.
+| Table | Partition key | Sort key |
+| --- | --- | --- |
+| InternStore-Users | userId | — |
+| InternStore-Products | productId | — |
+| InternStore-Categories | categoryId | — |
+| InternStore-Cart | userId | productId |
+| InternStore-Wishlist | userId | productId |
 
-## Project Structure
+Products use categoryId-createdAt-index for category queries. Table names are
+configurable. Setup and seed scripts exist for a **new development database**;
+do not run them against an existing store without checking the data first.
 
-```text
-novastore/
-├── docs/
-│   ├── ARCHITECTURE.md
-│   ├── API_REFERENCE.md
-│   ├── DATABASE_DESIGN.md
-│   ├── DEPLOYMENT.md
-│   └── TESTING.md
-├── scripts/
-│   ├── create-dynamodb-tables.mjs
-│   ├── seed-database.mjs
-│   └── final-smoke-test.mjs
-├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   ├── account/
-│   │   ├── cart/
-│   │   ├── products/
-│   │   └── wishlist/
-│   ├── components/
-│   ├── lib/
-│   │   ├── auth/
-│   │   ├── config/
-│   │   ├── db/
-│   │   ├── http/
-│   │   └── validation/
-│   ├── repositories/
-│   ├── services/
-│   ├── types/
-│   └── utils/
-├── .env.example
-├── package.json
-└── README.md
-```
+## Verification
 
-## Environment Variables
+- npm run lint
+- npm run build — Next.js and Sites production builds
+- npm run build:next — standard Next.js production build
+- npm run build:site — Sites/Cloudflare Worker build
+- npm run test:admin-auth — missing, invalid, and valid administrator credentials
+- npm run test:admin-db — isolated DynamoDB-compatible integration suite
+- node scripts/admin-preview-test.mjs — product browser flows
+- node scripts/admin-records-test.mjs — category/user/cart/wishlist browser flows
 
-Create `.env.local` in the project root for local development:
+Browser tests require a running local server and Playwright. Set
+PLAYWRIGHT_MODULE to an installed Playwright module path if it is not available
+in the project. Tests use installed Microsoft Edge by default. Database tests
+use an ephemeral local Dynalite instance and never access the AWS account.
 
-```env
-AWS_REGION=eu-central-1
-AWS_ACCESS_KEY_ID=your_access_key
-AWS_SECRET_ACCESS_KEY=your_secret_key
+## Administrative API
 
-DYNAMODB_USERS_TABLE=InternStore-Users
-DYNAMODB_PRODUCTS_TABLE=InternStore-Products
-DYNAMODB_CATEGORIES_TABLE=InternStore-Categories
-DYNAMODB_CART_TABLE=InternStore-Cart
-DYNAMODB_WISHLIST_TABLE=InternStore-Wishlist
+All endpoints below require Authorization: Bearer <ADMIN_ACCESS_KEY>.
 
-DEMO_USER_ID=demo-user-1
-```
+| Endpoint | Purpose |
+| --- | --- |
+| GET /api/admin | Read all five datasets; follows DynamoDB pagination |
+| POST /api/admin/manage | Category CRUD, user update/delete, cart/wishlist removal |
+| POST /api/products | Create product |
+| PATCH /api/products/:productId | Edit product, including stock |
+| DELETE /api/products/:productId | Delete unreferenced product |
+| POST /api/categories | Create category |
 
-Never commit `.env.local` or real AWS credentials. `.env.example` is safe to commit because it contains placeholders only.
+Public storefront product/category reads remain public. Invalid input returns
+400, unauthorized requests 401, missing admin configuration 503, missing records
+404, and records still in use 409.
 
-## Installation
+## Deletion rules and limits
 
-### 1. Clone the repository
+Products cannot be deleted while referenced by carts or wishlists. Categories
+cannot be deleted while containing products. Users cannot be deleted while
+they have cart or wishlist items. Remove/reassign related data explicitly first.
 
-```bash
-git clone https://github.com/Amiko13-stack/novastore.git
-cd novastore
-```
+Relationship checks use consistent scans followed by a conditional or keyed
+write, not a cross-table serializable transaction. Concurrent storefront writes
+can race with those checks. The snapshot-based admin reads and client-side
+search/pagination are intended for an internship-sized dataset. A production
+store with concurrent writers or large datasets needs coordinated relation
+locking/tombstones, indexed queries, and server-side pagination.
 
-### 2. Install dependencies
+The administrator key is a shared secret, not a per-user role-based login system.
+The storefront still uses its existing demo-user abstraction.
 
-```bash
-npm install
-```
+## Submission
 
-### 3. Configure environment variables
-
-Copy `.env.example` to `.env.local` and provide your own AWS values.
-
-### 4. Create the DynamoDB tables
-
-```bash
-node scripts/create-dynamodb-tables.mjs
-```
-
-### 5. Seed the demo catalog
-
-```bash
-node scripts/seed-database.mjs
-```
-
-### 6. Start development
-
-```bash
-npm run dev
-```
-
-Open `http://localhost:3000`.
-
-## Quality Checks
-
-```bash
-npm run lint
-npm run build
-```
-
-With the development server running, the optional final smoke test can be run with:
-
-```bash
-node scripts/final-smoke-test.mjs
-```
-
-See [`docs/TESTING.md`](docs/TESTING.md) for the complete manual test matrix.
-
-## Main API Routes
-
-```text
-GET/POST                /api/products
-GET/PATCH/DELETE        /api/products/:productId
-GET/POST                /api/categories
-GET/POST                /api/cart
-PATCH/DELETE            /api/cart/:productId
-GET/POST                /api/wishlist
-DELETE                   /api/wishlist/:productId
-GET/PATCH                /api/users/me
-GET                      /api/health
-GET                      /api/health/database
-```
-
-Search/filter/sort parameters supported by `GET /api/products` include:
-
-```text
-q
-categoryId
-minPrice
-maxPrice
-sort
-```
-
-See [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md) for details.
-
-## Deployment
-
-The application is prepared for Vercel deployment. Production needs the same server-side AWS and DynamoDB environment variables configured in the Vercel project settings.
-
-See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for the final deployment procedure.
-
-## Submission Checklist
-
-Before internship submission, confirm:
-
-- GitHub repository is up to date
-- Production build passes
-- Live project opens successfully (if deployed)
-- DynamoDB-backed cart and wishlist persist after refresh
-- Responsive layouts work on mobile/tablet/desktop
-- README and documentation are committed
-- Final screenshots are captured
-- No `.env.local` or AWS credentials are in GitHub
-
-See [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) for the full checklist.
-
-## Scope Note
-
-Authentication and payment processing were intentionally not added because they are outside the stated internship requirements. User-dependent features are isolated behind a current-user abstraction, allowing real authentication to replace the demo user later without rewriting the cart or wishlist architecture.
+See [submission checklist](SUBMISSION_CHECKLIST.md) and [AWS connection guide](docs/AWS_CONNECTION.md).
+Dashboard screenshots are in [docs/screenshots](docs/screenshots).

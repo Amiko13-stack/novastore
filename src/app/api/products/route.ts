@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/auth/admin";
 import type { NextRequest } from "next/server";
 import { apiErrorResponse } from "@/lib/http/api-error";
 import { catalogQuerySchema } from "@/lib/validation/catalog.schema";
@@ -32,6 +33,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: Request) {
   try {
+    requireAdmin(request);
     const body = await request.json();
     const input = createProductSchema.parse(body);
     const product = await createProduct(input);

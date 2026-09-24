@@ -1,9 +1,9 @@
 import { env } from "@/lib/config/env";
 
 export const TABLES = {
-  users: env.usersTable(),
-  products: env.productsTable(),
-  categories: env.categoriesTable(),
-  cart: env.cartTable(),
-  wishlist: env.wishlistTable(),
+  get users() { return env.usersTable(); },
+  get products() { return env.productsTable(); },
+  get categories() { return env.categoriesTable(); },
+  get cart() { return env.cartTable(); },
+  get wishlist() { return env.wishlistTable(); },
 };

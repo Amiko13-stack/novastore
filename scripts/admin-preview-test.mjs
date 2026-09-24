@@ -1,0 +1,63 @@
+import { createRequire } from "node:module";
+const loadDependency = createRequire(import.meta.url);
+const { chromium } = loadDependency(process.env.PLAYWRIGHT_MODULE || "playwright");
+import assert from "node:assert/strict";
+import fs from "node:fs";
+(async () => {
+  const browser = await chromium.launch({ headless: true, channel: process.env.PLAYWRIGHT_CHANNEL || "msedge" });
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1050 } });
+  const errors = [];
+  page.on("pageerror", error => errors.push(error.message));
+  try {
+    await page.goto("http://127.0.0.1:3000/admin");
+    await page.getByRole("heading", { name: "Store overview" }).waitFor();
+    fs.mkdirSync("docs/screenshots", { recursive: true });
+    await page.screenshot({ path: "docs/screenshots/admin-overview.png", fullPage: true });
+    await page.getByRole("navigation", { name: "Admin navigation" }).getByRole("button", { name: "Products" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
+    await page.getByText("Page 2 of 2", { exact: false }).waitFor();
+    await page.getByRole("button", { name: "Previous", exact: true }).click();
+    await page.getByRole("button", { name: "Add product" }).click();
+    await page.getByLabel("Product name", { exact: true }).fill("QA test product");
+    await page.getByLabel("Description", { exact: true }).fill("A sample product used to verify the admin workflow.");
+    await page.getByLabel("Price (USD)").fill("19.50");
+    await page.getByLabel("Stock quantity").fill("12");
+    await page.getByLabel("Image URL").fill("https://example.com/qa.jpg");
+    await page.getByRole("button", { name: "Save product", exact: true }).click();
+    await page.getByRole("status").filter({ hasText: "QA test product added." }).waitFor();
+    await page.getByRole("textbox", { name: "Search products" }).fill("QA test product");
+    await page.getByRole("button", { name: "Edit QA test product", exact: true }).click();
+    await page.getByLabel("Stock quantity").fill("0");
+    await page.getByRole("button", { name: "Save product", exact: true }).click();
+    await page.getByRole("status").filter({ hasText: "QA test product updated." }).waitFor();
+    await page.getByRole("combobox", { name: "Filter stock" }).selectOption("out");
+    await page.getByRole("cell", { name: "Out of stock", exact: true }).waitFor();
+    await page.getByRole("button", { name: "Delete QA test product", exact: true }).click();
+    await page.getByRole("button", { name: "Keep product", exact: true }).click();
+    await page.getByRole("button", { name: "Delete QA test product", exact: true }).waitFor();
+    await page.getByRole("button", { name: "Delete QA test product", exact: true }).click();
+    await page.getByRole("button", { name: "Delete product", exact: true }).click();
+    await page.getByRole("heading", { name: "No products found" }).waitFor();
+    for (const name of ["Categories", "Users", "Cart", "Wishlist"]) {
+      await page.getByRole("navigation", { name: "Admin navigation" }).getByRole("button", { name, exact: true }).click();
+      await page.getByRole("heading", { name, exact: true }).waitFor();
+    }
+    await page.reload();
+    await page.getByRole("heading", { name: "Store overview" }).waitFor();
+    await page.getByRole("navigation", { name: "Admin navigation" }).getByRole("button", { name: "Products" }).click();
+    await page.screenshot({ path: "docs/screenshots/admin-products.png", fullPage: true });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({ path: "docs/screenshots/admin-mobile.png", fullPage: true });
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+    assert.equal(overflow, false, "Mobile page must not overflow horizontally");
+    await page.getByRole("button", { name: "Add product" }).click();
+    await page.getByLabel("Product name", { exact: true }).waitFor();
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Connect store", exact: true }).click();
+    await page.getByLabel("Administrator access key").fill("x".repeat(32));
+    await page.getByRole("button", { name: "Connect", exact: true }).click();
+    await page.getByRole("alert").filter({ hasText: "Live administration is not configured." }).waitFor();
+    assert.deepEqual(errors, []);
+    console.log("PASS: sample product create/edit/filter/paginate/delete/cancel, data views, reset, mobile overflow, dialog keyboard, connection error, and browser runtime.");
+  } finally { await browser.close(); }
+})().catch(error => { console.error(error); process.exit(1); });

@@ -3,7 +3,8 @@ import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { env } from "@/lib/config/env";
 
 export const dynamoDBClient = new DynamoDBClient({
-  region: env.awsRegion(),
+  region: async () => env.awsRegion(),
+  endpoint: process.env.DYNAMODB_ENDPOINT || undefined,
 });
 
 export const documentClient = DynamoDBDocumentClient.from(dynamoDBClient, {

@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/auth/admin";
 import { apiErrorResponse } from "@/lib/http/api-error";
 import { createCategorySchema } from "@/lib/validation/category.schema";
 import {
@@ -20,6 +21,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    requireAdmin(request);
     const body = await request.json();
     const input = createCategorySchema.parse(body);
     const category = await createCategory(input);

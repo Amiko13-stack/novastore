@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Footer } from "@/components/layout/footer";
-import { Header } from "@/components/layout/header";
+import { StorefrontFrame } from "@/components/layout/storefront-frame";
+
 
 export const metadata: Metadata = {
   title: {
@@ -15,9 +15,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className="min-h-screen bg-[#f6f6f3] text-zinc-950 antialiased">
-        <Header />
+        <StorefrontFrame>
         {children}
-        <Footer />
+        </StorefrontFrame>
       </body>
     </html>
   );

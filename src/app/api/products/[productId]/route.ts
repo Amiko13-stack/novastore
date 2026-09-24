@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/auth/admin";
 import { apiErrorResponse } from "@/lib/http/api-error";
 import { updateProductSchema } from "@/lib/validation/product.schema";
 import {
@@ -32,6 +33,7 @@ export async function PATCH(
   { params }: ProductRouteContext,
 ) {
   try {
+    requireAdmin(request);
     const { productId } = await params;
     const body = await request.json();
     const input = updateProductSchema.parse(body);
@@ -47,10 +49,11 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: ProductRouteContext,
 ) {
   try {
+    requireAdmin(request);
     const { productId } = await params;
     const product = await deleteProduct(productId);
 
