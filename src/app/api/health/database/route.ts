@@ -1,27 +1,15 @@
-import { ListTablesCommand } from "@aws-sdk/client-dynamodb";
-import { dynamoDBClient } from "@/lib/db/dynamodb";
+import { requireAdmin } from "@/lib/auth/admin";
+import { apiErrorResponse } from "@/lib/http/api-error";
+import { getAdminData } from "@/services/admin.service";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const result = await dynamoDBClient.send(new ListTablesCommand({ Limit: 20 }));
-
-    return Response.json({
-      success: true,
-      database: "connected",
-      tables: result.TableNames ?? [],
-    });
+    requireAdmin(request);
+    const data = await getAdminData();
+    return Response.json({ success: true, database: "connected", counts: Object.fromEntries(Object.entries(data).map(([name, rows]) => [name, rows.length])) }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    console.error("DynamoDB health check failed", error);
-
-    return Response.json(
-      {
-        success: false,
-        database: "disconnected",
-        message: "Could not connect to DynamoDB. Check AWS credentials and region.",
-      },
-      { status: 500 },
-    );
+    return apiErrorResponse(error);
   }
 }

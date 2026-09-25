@@ -88,6 +88,7 @@ All endpoints below require Authorization: Bearer <ADMIN_ACCESS_KEY>.
 
 | Endpoint | Purpose |
 | --- | --- |
+| GET /api/health/database | Authenticated connection status and record counts |
 | GET /api/admin | Read all five datasets; follows DynamoDB pagination |
 | POST /api/admin/manage | Category CRUD, user update/delete, cart/wishlist removal |
 | POST /api/products | Create product |
@@ -113,7 +114,9 @@ store with concurrent writers or large datasets needs coordinated relation
 locking/tombstones, indexed queries, and server-side pagination.
 
 The administrator key is a shared secret, not a per-user role-based login system.
-The storefront still uses its existing demo-user abstraction.
+The storefront retains its existing demo-user abstraction for local development.
+The public admin deployment sets ADMIN_ONLY_MODE=true: storefront pages redirect
+to /admin and shared demo-customer API requests are rejected with 403.
 
 ## Submission
 

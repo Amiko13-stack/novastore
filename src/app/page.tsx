@@ -14,6 +14,7 @@ import { getWishlist } from "@/services/wishlist.service";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  if (process.env.ADMIN_ONLY_MODE === "true") redirect("/admin");
   if (!process.env.AWS_REGION) redirect("/admin");
   const [categories, products, wishlist] = await Promise.all([
     getCategories(),

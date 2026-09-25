@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { CatalogControls } from "@/components/catalog/catalog-controls";
 import { ProductGrid } from "@/components/product/product-grid";
@@ -26,6 +27,7 @@ type ProductsPageProps = {
 };
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  if (process.env.ADMIN_ONLY_MODE === "true") redirect("/admin");
   const rawParams = await searchParams;
   const parsed = catalogQuerySchema.safeParse(rawParams);
   const filters = parsed.success

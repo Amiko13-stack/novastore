@@ -22,7 +22,25 @@ login credentials must not be used as the final hosted credential solution.
 
 Required data operations are GetItem, PutItem, UpdateItem, DeleteItem, Scan, and
 Query on the five configured tables and the product category index.
-The optional database-health route additionally uses ListTables.
+The authenticated database-health route reads only these configured tables.
 Existing tables must be inspected before creating or seeding anything.
 
 The public sample dashboard remains usable when live AWS is not configured.
+
+## Deployed identity
+
+The Sites deployment uses the dedicated IAM user novastore-sites-dashboard.
+Its table-scoped policy is in aws/sites-dynamodb-policy.json. The baseline was
+generated with IAM Policy Autopilot, then restricted to the existing five tables
+and product index; unused replication/KMS permissions were removed.
+AWS keys and the administrator key belong only in Sites secret settings.
+The website never uses the AWS account root login.
+
+ADMIN_ONLY_MODE=true disables the original shared demo-customer session and
+redirects storefront pages to /admin. Public product/category catalog reads
+remain available; customer and administration records require protected access.
+
+The external host uses a dedicated access key. Rotate it in IAM and replace
+the corresponding Sites secrets, then redeploy. Revoke the old key after
+verifying the replacement. Delete the identity when the deployment is retired.
+See https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html.

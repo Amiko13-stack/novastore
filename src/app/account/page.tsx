@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { AccountForm } from "@/components/account/account-form";
 import { Container } from "@/components/ui/container";
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
+  if (process.env.ADMIN_ONLY_MODE === "true") redirect("/admin");
   const user = await getOrCreateUser(getCurrentUserId());
 
   return (

@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -34,6 +35,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 }
 
 export default async function ProductDetailsPage({ params }: ProductPageProps) {
+  if (process.env.ADMIN_ONLY_MODE === "true") redirect("/admin");
   const { productId } = await params;
   const product = await getProductById(productId);
 

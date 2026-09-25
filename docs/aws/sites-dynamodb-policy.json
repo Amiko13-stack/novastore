@@ -1,0 +1,25 @@
+{
+  "Id": "IamPolicyAutopilot",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:DeleteItem",
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:eu-central-1:271954948037:table/InternStore-Users",
+        "arn:aws:dynamodb:eu-central-1:271954948037:table/InternStore-Products",
+        "arn:aws:dynamodb:eu-central-1:271954948037:table/InternStore-Categories",
+        "arn:aws:dynamodb:eu-central-1:271954948037:table/InternStore-Cart",
+        "arn:aws:dynamodb:eu-central-1:271954948037:table/InternStore-Wishlist",
+        "arn:aws:dynamodb:eu-central-1:271954948037:table/InternStore-Products/index/categoryId-createdAt-index"
+      ]
+    }
+  ]
+}

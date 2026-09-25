@@ -64,6 +64,17 @@ try {
   await admin.manageRecord({ resource: "users", action: "delete", id: "test-user" });
   await admin.manageRecord({ resource: "categories", action: "delete", id: category.categoryId });
   await assert.rejects(() => admin.manageRecord({ resource: "categories", action: "delete", id: category.categoryId }), error => error.statusCode === 404);
+  process.env.ADMIN_ONLY_MODE = "true";
+  const currentUser = load("src/lib/auth/current-user.ts");
+  assert.throws(() => currentUser.getCurrentUserId(), error => error.statusCode === 403);
+  for (const path of ["cart", "wishlist", "users/me"]) {
+    const handler = load("src/app/api/" + path + "/route.ts");
+    assert.equal((await handler.GET()).status, 403);
+  }
+  const health = load("src/app/api/health/database/route.ts");
+  assert.equal((await health.GET(new Request("https://example.com/api/health/database"))).status, 401);
+  assert.equal((await health.GET(new Request("https://example.com/api/health/database", {headers:{authorization:"Bearer "+process.env.ADMIN_ACCESS_KEY}}))).status, 200);
+  delete process.env.ADMIN_ONLY_MODE;
   const empty = await admin.getAdminData(); assert.equal(Object.values(empty).flat().length, 0);
   console.log("PASS: DynamoDB-compatible integration — category/product CRUD, stock, user updates/deletion, relationship guards, cart/wishlist removal, authorization, input validation, empty state, and missing records.");
 } finally {

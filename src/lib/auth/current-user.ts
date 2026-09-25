@@ -1,3 +1,4 @@
+import { AppError } from "@/lib/http/api-error";
 import { env } from "@/lib/config/env";
 
 /**
@@ -6,5 +7,8 @@ import { env } from "@/lib/config/env";
  * can replace this later without changing cart/wishlist business logic.
  */
 export function getCurrentUserId(): string {
+  if (process.env.ADMIN_ONLY_MODE === "true") {
+    throw new AppError("Customer sign-in is unavailable on this administration site.", 403);
+  }
   return env.demoUserId();
 }

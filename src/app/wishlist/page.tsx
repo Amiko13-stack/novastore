@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ProductGrid } from "@/components/product/product-grid";
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function WishlistPage() {
+  if (process.env.ADMIN_ONLY_MODE === "true") redirect("/admin");
   const [wishlist, categories] = await Promise.all([
     getWishlist(getCurrentUserId()),
     getCategories(),
