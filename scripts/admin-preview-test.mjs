@@ -9,7 +9,7 @@ import fs from "node:fs";
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
   try {
-    await page.goto("http://127.0.0.1:3000/admin");
+    await page.goto((process.env.ADMIN_TEST_BASE_URL || "http://127.0.0.1:3000") + "/admin");
     await page.getByRole("heading", { name: "Store overview" }).waitFor();
     await page.getByRole("navigation", { name: "Admin navigation" }).getByRole("button", { name: "Products" }).click();
     await page.getByRole("heading", { name: "Products", exact: true }).waitFor();
