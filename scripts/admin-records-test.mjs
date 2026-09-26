@@ -5,6 +5,7 @@ const browser = await chromium.launch({ channel: "msedge", headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1050 } });
 try {
   await page.goto((process.env.ADMIN_TEST_BASE_URL || "http://127.0.0.1:3000") + "/admin");
+    await page.waitForLoadState("networkidle");
   const nav = name => page.getByRole("navigation", { name: "Admin navigation" }).getByRole("button", { name, exact: true });
   await nav("Categories").click();
   await page.getByRole("button", { name: "Add category" }).click();

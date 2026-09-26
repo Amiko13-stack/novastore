@@ -6,7 +6,7 @@ with React, TypeScript, Tailwind CSS, and AWS DynamoDB.
 ## Submission links
 
 - Repository: https://github.com/Amiko13-stack/novastore
-- Hosted dashboard: https://novastore-admin-amiko.amovardo2007.chatgpt.site/admin
+- Hosted dashboard: https://72yo7ehlzggvvs2jxfynxdwtii0wuxgh.lambda-url.eu-central-1.on.aws/admin
 - Screenshots: docs/screenshots
 - The hosted default view is explicitly labelled sample mode.
 
@@ -32,8 +32,11 @@ and an administrator key are available.
 
 Browser → Next.js route handlers → validation/services → repositories → DynamoDB.
 
-The standard Next.js build remains available. A separate Vinext/Vite adapter
-produces the Cloudflare Worker artifact used by Sites hosting.
+The submitted website runs the standard Next.js standalone server on AWS Lambda
+with the official AWS Lambda Web Adapter. Its execution role grants access to
+the five existing DynamoDB tables, without static AWS access keys. See
+[deployment instructions](docs/AWS_HOSTING.md). The optional Vinext/Vite build
+remains available for the earlier Sites deployment.
 
 ## Local setup
 
@@ -47,6 +50,7 @@ Live data requires an ignored .env.local file with the variables documented in
 .env.example. AWS credentials must be supplied through the server environment or
 the standard AWS credential provider chain. For local development, AWS CLI
 sign-in can supply short-lived credentials. Do not commit credentials.
+On AWS hosting, the Lambda execution role supplies credentials automatically.
 
 ADMIN_ACCESS_KEY must contain at least 32 random characters. Enter this key in
 Connect store. It stays in browser memory only; reload/disconnect ends the

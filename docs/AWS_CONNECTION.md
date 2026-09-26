@@ -27,7 +27,14 @@ Existing tables must be inspected before creating or seeding anything.
 
 The public sample dashboard remains usable when live AWS is not configured.
 
-## Deployed identity
+## Current AWS host
+
+The submission website runs on AWS Lambda using NovaStoreDashboardLambdaRole.
+It uses temporary role credentials automatically; no AWS access keys are stored
+in the Lambda configuration. ADMIN_ACCESS_KEY remains a private server setting.
+See AWS_HOSTING.md for packaging, configuration, and verification instructions.
+
+## Earlier Sites deployment
 
 The Sites deployment uses the dedicated IAM user novastore-sites-dashboard.
 Its table-scoped policy is in aws/sites-dynamodb-policy.json. The baseline was
